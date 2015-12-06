@@ -5,6 +5,8 @@
 
 # include "helper.h"
 
+short unsigned int ITEM(0), SPACE(1), MUTEX(2);
+
 int main (int argc, char **argv)
 {
   int list_length;
@@ -24,12 +26,14 @@ int main (int argc, char **argv)
 
   //SETTING UP SEMAPHORES: -- COULD USE SETALL HERE INSTEAD IN SEMUN
   semid = sem_create(SEM_KEY, 3);
-  sem_init(semid, 0, 0); // item: ensures list not empty
-  sem_init(semid, 1, list_length); // space: ensures list not full
-  sem_init(semid, 2, 1); // mutex
+  sem_init(semid, ITEM, 0); // ensures list not empty
+  sem_init(semid, SPACE, list_length); // ensures list not full
+  sem_init(semid, MUTEX, 1); // ensures mutual exclusion of access
 
-  //sleep(5); // SET TO A MORE APPROPRIATE VALUE
+  printf("\n");
+
+  sleep(3); // SET TO A MORE APPROPRIATE VALUE
   //sem_close(semid);
-  //shm_detach(shmem_ptr);
+  shm_detach(shmem_ptr);
   return 0;
 }
