@@ -13,7 +13,6 @@ int main (int argc, char **argv)
   int shmid, semid;
   QUEUE *shmem_ptr;
   list_length = check_arg(argv[1]);
-  //clock_t begin_all = clock();
 
   //SETTING UP SHARED MEMORY:
   shmid = shm_create(SHM_KEY, SHM_SIZE);
@@ -30,10 +29,7 @@ int main (int argc, char **argv)
   sem_init(semid, SPACE, list_length); // ensures list not full
   sem_init(semid, MUTEX, 1); // ensures mutual exclusion of access
 
-  printf("\n");
-
-  sleep(3); // SET TO A MORE APPROPRIATE VALUE
-  //sem_close(semid);
-  shm_detach(shmem_ptr);
+  //sleep(30); // SET TO A MORE APPROPRIATE VALUE
+  //shm_detach(shmem_ptr);
   return 0;
 }

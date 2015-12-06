@@ -106,6 +106,13 @@ int shm_detach (QUEUE* shmem_ptr) {
   return 0;
 }
 
+int shm_check_attached (int shmid) {
+  shmid_ds *shared = new shmid_ds;
+  if (shmctl (shmid, IPC_STAT, shared) < 0)
+    return -1;
+  return shared->shm_nattch;      
+}
+
 int shm_close (int shmid) {
   if (shmctl (shmid, IPC_RMID, NULL) < 0)
     return -1;

@@ -57,3 +57,4 @@ int shm_create(key_t key, size_t size);
 QUEUE* shm_attach(int shmid);
 int shm_detach (QUEUE* shmem_ptr);
 int shm_close (int shmid);
+int shm_check_attached (int shmid);

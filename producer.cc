@@ -35,118 +35,28 @@ int main (int argc, char *argv[])
 
   for(int i = 0; i < producer_jobs; i++) {
     while((time(NULL) - producer_start) < job_t[i]) {
-    }
-    sem_wait(semid, SPACE); // down(SPACE)
-    sem_wait(semid, MUTEX); // down(MUTEX)
-    int queue_end = shmem_ptr -> end;
-    int job_id = queue_end + 1;
-    int job_duration = job_d[i]; // RANDOM NUMBER
-    shmem_ptr -> job[queue_end].id = job_id; //job id
-    shmem_ptr -> job[queue_end].duration = job_duration; //job duration
-    shmem_ptr -> end = job_id % 5;
-    printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, job_t[i], job_id, job_duration);
+    } // Loop if elapsed time < job start time
+    sem_wait(semid, SPACE); // down(SPACE) - check room in list
+    sem_wait(semid, MUTEX); // down(MUTEX) - enter critical section
+    int queue_end = shmem_ptr -> end; // current end of the queue
+    int job_id = queue_end + 1; //job_id = 1 + queue location
+    int job_duration = job_d[i];
+    shmem_ptr -> job[queue_end].id = job_id; //assign job id
+    shmem_ptr -> job[queue_end].duration = job_duration; //assign job duration
+    shmem_ptr -> end = job_id % 5; // increment end of queue
+    printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, 
+	   job_t[i], job_id, job_duration);
     //producer_jobs--;
-    sem_signal(semid, MUTEX); // up(MUTEX)
-    sem_signal(semid, ITEM); // up(ITEM)
+    sem_signal(semid, MUTEX); // up(MUTEX) - exit critical region
+    sem_signal(semid, ITEM); // up(ITEM) - increment item count semphore
   }
 
-    
-  /*
-  time_spent = (time(NULL) - producer_start); // job created
-  sem_wait(semid, SPACE); // down(SPACE)
-  sem_wait(semid, MUTEX); // down(MUTEX)
-  int queue_end = shmem_ptr -> end;
-  int job_id = queue_end + 1;
-  int job_duration = 6; // RANDOM NUMBER
-  shmem_ptr -> job[queue_end].id = job_id; //job id
-  shmem_ptr -> job[queue_end].duration = job_duration; //job duration
-  shmem_ptr -> end = job_id % 5;
-  printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, time_spent, job_id, job_duration);
-  producer_jobs--;
-  sem_signal(semid, MUTEX); // up(MUTEX)
-  sem_signal(semid, ITEM); // up(ITEM)
-  sleep(2);
-
-  time_spent = (time(NULL) - producer_start);
-  sem_wait(semid, SPACE); // down(SPACE)
-  sem_wait(semid, MUTEX); // down(MUTEX)
-  queue_end = shmem_ptr -> end;
-  job_id = queue_end + 1;
-  job_duration = 6; // RANDOM NUMBER
-  shmem_ptr -> job[queue_end].id = job_id; //job id
-  shmem_ptr -> job[queue_end].duration = job_duration; //job duration
-  shmem_ptr -> end = job_id % 5;
-  printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, time_spent, job_id, job_duration);
-  producer_jobs--;
-  sem_signal(semid, MUTEX); // up(MUTEX)
-  sem_signal(semid, ITEM); // up(ITEM)
-  sleep(4);
-
-  time_spent = (time(NULL) - producer_start);
-  sem_wait(semid, SPACE); // down(SPACE)
-  sem_wait(semid, MUTEX); // down(MUTEX)
-  queue_end = shmem_ptr -> end;
-  job_id = queue_end + 1;
-  job_duration = 7; // RANDOM NUMBER
-  shmem_ptr -> job[queue_end].id = job_id; //job id
-  shmem_ptr -> job[queue_end].duration = job_duration; //job duration
-  shmem_ptr -> end = job_id % 5;
-  printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, time_spent, job_id, job_duration);
-  producer_jobs--;
-  sem_signal(semid, MUTEX); // up(MUTEX)
-  sem_signal(semid, ITEM); // up(ITEM)
-  sleep(1);
+  printf("Producer(%i) time%3i: No more jobs to generate\n", producer_id, 
+	 job_t[producer_jobs - 1]); // when not more jobs to produce
   
-  time_spent = (time(NULL) - producer_start);
-  sem_wait(semid, SPACE); // down(SPACE)
-  sem_wait(semid, MUTEX); // down(MUTEX)
-  queue_end = shmem_ptr -> end;
-  job_id = queue_end + 1;
-  job_duration = 3; // RANDOM NUMBER
-  shmem_ptr -> job[queue_end].id = job_id; //job id
-  shmem_ptr -> job[queue_end].duration = job_duration; //job duration
-  shmem_ptr -> end = job_id % 5;
-  printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, time_spent, job_id, job_duration);
-  producer_jobs--;
-  sem_signal(semid, MUTEX); // up(MUTEX)
-  sem_signal(semid, ITEM); // up(ITEM)
-  sleep(4);
+  shm_detach(shmem_ptr); // detach from shared memory
 
-  time_spent = (time(NULL) - producer_start);
-  sem_wait(semid, SPACE); // down(SPACE)
-  sem_wait(semid, MUTEX); // down(MUTEX)
-  queue_end = shmem_ptr -> end;
-  job_id = queue_end + 1;
-  job_duration = 2; // RANDOM NUMBER
-  shmem_ptr -> job[queue_end].id = job_id; //job id
-  shmem_ptr -> job[queue_end].duration = job_duration; //job duration
-  shmem_ptr -> end = job_id % 5;
-  printf("Producer(%i) time%3i: Job id %i duration %i\n", producer_id, time_spent, job_id, job_duration);
-  producer_jobs--;
-  sem_signal(semid, MUTEX); // up(MUTEX)
-  sem_signal(semid, ITEM); // up(ITEM)
-
-  printf("Producer(%i) time%3i: No more jobs to generate\n", producer_id, time_spent);
-  */
-
-  printf("Producer(%i) time%3i: No more jobs to generate\n", producer_id, job_t[producer_jobs - 1]);
-
-
-  /*
-  while(job_count < producer_jobs) {
-    JOBTYPE* job = new JOBTYPE;
-    (job -> id) = producer_jobs; //ERROR - NEEDS TO BE FIXED
-    (job -> duration) = 4;
-    job_count++;
-  }
-  */
-
-  //QUIT WHEN THERE ARE NO MORE JOBS LEFT TO PRODUCE
-  shm_detach(shmem_ptr);
-  sleep(60);
-  
-
-
+  sleep(60); // sleep to avoid System V semaphore value reset
 
   return 0;
 }
