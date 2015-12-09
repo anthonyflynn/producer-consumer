@@ -16,6 +16,8 @@
 # include <errno.h>
 # include <string.h>
 # include <time.h>
+# include <stdlib.h>
+# include <ctype.h>
 
 # define SHM_KEY 0x54C // Change this number as needed
 # define SHM_W 0200
